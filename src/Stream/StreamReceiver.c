@@ -167,8 +167,8 @@ TinyRet StreamReceiver_Start(StreamReceiver *thiz,
         /**
          * 128 bit key
          */
-        sec_servs |= sec_serv_conf;
-        sec_servs |= sec_serv_auth;
+        sec_servs |= sec_serv_conf;             // -e
+        // sec_servs |= sec_serv_auth;          // -a
 
         srtp_crypto_policy_set_rtp_default(&thiz->policy.rtp);
         srtp_crypto_policy_set_rtcp_default(&thiz->policy.rtcp);
@@ -260,6 +260,8 @@ static void loop(void *param)
 
     thiz->running = true;
 
+    LOG_D(TAG, "start receiving ...");
+
     while (thiz->running)
     {
         char packet[PACKET_LEN];
@@ -269,9 +271,12 @@ static void loop(void *param)
         size = rtp_recvfrom(thiz->receiver, packet, &packet_len);
         if (size < 0)
         {
+            LOG_D(TAG, "recvfrom < 0");
             break;
         }
 
         thiz->handler(packet, size);
     }
+
+    LOG_D(TAG, "stop receiving");
 }
