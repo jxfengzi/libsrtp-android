@@ -64,7 +64,14 @@ ENDIF(WIN32)
 # include dir
 #
 #---------------------------------------------------------------------------------------
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/libsrtp/crypto/include)
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/libsrtp/include)
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/Tiny/Base)
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/Tiny/Log)
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/Tiny/Memory)
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/Tiny/Container)
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/Tiny/Thread)
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/Stream)
 
 #--------------------------------------------------------------------------------------
 #
@@ -73,14 +80,18 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/libsrtp/include)
 #--------------------------------------------------------------------------------------
 IF (WIN32)
     SET(OS_LIB)
+    SET(SRTP_LIB ${PROJECT_SOURCE_DIR}/libsrtp/libsrtp2.lib)
 ELSE (WIN32)
     IF(APPLE)
-        SET(OS_LIB)
+        SET(OS_LIB pthread)
+        SET(SRTP_LIB ${PROJECT_SOURCE_DIR}/libsrtp/libsrtp2.a)
     ELSE(APPLE)
-        SET(OS_LIB)
+        SET(OS_LIB pthread)
+        SET(SRTP_LIB ${PROJECT_SOURCE_DIR}/libsrtp/libsrtp2.a)
     ENDIF(APPLE)
 ENDIF (WIN32)
 
+MESSAGE(STATUS "srtp_lib: ${SRTP_LIB}")
 MESSAGE(STATUS "os_lib: ${OS_LIB}")
 
 #-------------------------------------------------------------------------------------
