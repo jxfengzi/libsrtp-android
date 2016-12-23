@@ -37,7 +37,7 @@ typedef void (*StreamPacketHandler)(const char *data, int size);
 STREAM_API TinyRet StreamReceiver_Start(StreamReceiver *thiz,
                                      const char *ip,
                                      int port,
-                                     const char *key,
+                                     const char *keyBase64,
                                      uint32_t ssrc,
                                      StreamPacketHandler handler);
 

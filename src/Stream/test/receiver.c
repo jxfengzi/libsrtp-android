@@ -1,8 +1,11 @@
 #include "StreamReceiver.h"
+#include <tiny_log.h>
 
+#define TAG "receiver"
 
 static void packet_handler(const char *packet, int len)
 {
+    LOG_D(TAG, "packet_handler: %d", len);
 }
 
 int main()
@@ -15,7 +18,12 @@ int main()
 
     StreamReceiver_Start(thiz, ip, port, key, ssrc, packet_handler);
 
-    StreamReceiver_Stop(thiz);
+    // StreamReceiver_Stop(thiz);
+
+    while (1)
+    {
+        sleep(10);
+    }
 
     return 0;
 }
