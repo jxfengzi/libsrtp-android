@@ -91,6 +91,19 @@ LOCAL_LDLIBS            := -llog
 include $(BUILD_SHARED_LIBRARY)
 
 #----------------------------------------------------------------------------
+# libstream_jni.so
+#----------------------------------------------------------------------------
+include $(CLEAR_VARS)
+LOCAL_MODULE            := stream_jni
+SRC_DIR                 := ../../src/Stream
+LOCAL_SRC_FILES         := $(SRC_DIR)/com_ouyang_camera_CameraStreamReceiver.c
+LOCAL_C_FLAGS           := $(MY_CFLAGS)
+LOCAL_C_INCLUDES        := $(INC_ALL)
+LOCAL_SHARED_LIBRARIES  := stream
+LOCAL_LDLIBS            := -llog
+include $(BUILD_SHARED_LIBRARY)
+
+#----------------------------------------------------------------------------
 # test: receiver
 #----------------------------------------------------------------------------
 include $(CLEAR_VARS)
