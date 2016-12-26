@@ -99,6 +99,8 @@ void StreamReceiver_Dispose(StreamReceiver *thiz)
 {
     RETURN_IF_FAIL(thiz);
 
+    StreamReceiver_Stop(thiz);
+
     srtp_shutdown();
 
     memset(thiz, 0, sizeof(StreamReceiver));
@@ -130,7 +132,8 @@ TinyRet StreamReceiver_Start(StreamReceiver *thiz,
 
     thiz->handler = handler;
 
-    do {
+    do
+    {
         srtp_err_status_t status;
         char key[MAX_KEY_LEN];
         srtp_sec_serv_t sec_servs = sec_serv_none;
@@ -139,6 +142,13 @@ TinyRet StreamReceiver_Start(StreamReceiver *thiz,
         int expected_len = 0;
         int len = 0;
         int pad = 0;
+
+        if (thiz->running)
+        {
+            LOG_E(TAG, "already started");
+            ret = TINY_RET_E_STARTED;
+            break;
+        }
 
         if (0 == inet_aton(ip, &address)) {
             LOG_E(TAG, "cannot parse IP v4 address %s", ip);
@@ -248,8 +258,16 @@ TinyRet StreamReceiver_Stop(StreamReceiver *thiz)
 {
     RETURN_VAL_IF_FAIL(thiz, TINY_RET_E_ARG_NULL);
 
-    rtp_receiver_deinit_srtp(thiz->receiver);
-    rtp_receiver_dealloc(thiz->receiver);
+    if (thiz->running)
+    {
+        close(thiz->sock);
+        thiz->running = false;
+
+        TinyThread_Join(&thiz->thread);
+
+        rtp_receiver_deinit_srtp(thiz->receiver);
+        rtp_receiver_dealloc(thiz->receiver);
+    }
 
     return TINY_RET_OK;
 }
@@ -258,9 +276,9 @@ static void loop(void *param)
 {
     StreamReceiver *thiz = (StreamReceiver *)param;
 
-    thiz->running = true;
-
     LOG_D(TAG, "start receiving ...");
+
+    thiz->running = true;
 
     while (thiz->running)
     {

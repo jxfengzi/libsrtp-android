@@ -42,7 +42,11 @@ bool ctx_gen_ipc_name(const char *name, char *full_name, uint32_t len)
     #ifdef __MAC_OSX__
         tiny_snprintf(full_name, len, "%s%s%llu", dir, slash, usec);
     #else
-        tiny_snprintf(full_name, len, "%s%s%lu", dir, slash, usec);
+        #ifdef __ANDROID__
+            tiny_snprintf(full_name, len, "%s%s%llu", dir, slash, usec);
+        #else
+            tiny_snprintf(full_name, len, "%s%s%lu", dir, slash, usec);
+        #endif
     #endif
     }
     else
