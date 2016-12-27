@@ -6,7 +6,7 @@
 extern "C" {
 #endif
 
-#define TAG             "stream_r_jni"
+#define TAG             "stream_s_jni"
 
 static StreamSender   * _sender = NULL;
 
