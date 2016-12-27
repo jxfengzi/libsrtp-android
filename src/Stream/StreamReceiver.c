@@ -234,7 +234,7 @@ TinyRet StreamReceiver_Start(StreamReceiver *thiz,
 
         thiz->receiver = rtp_receiver_alloc();
         if (thiz->receiver == NULL) {
-            LOG_E(TAG, "error: malloc() failed");
+            LOG_E(TAG, "rtp_receiver_alloc failed");
             ret = TINY_RET_E_NEW;
             break;
         }

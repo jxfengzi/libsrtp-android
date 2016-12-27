@@ -32,8 +32,11 @@ STREAM_API TinyRet StreamSender_Construct(StreamSender *thiz);
 STREAM_API void StreamSender_Dispose(StreamSender *thiz);
 STREAM_API void StreamSender_Delete(StreamSender *thiz);
 
+STREAM_API TinyRet StreamSender_Initialize(StreamSender *thiz, const char *ip, int port, const char *key, uint32_t ssrc);
+STREAM_API void StreamSender_Finalize(StreamSender *thiz);
+STREAM_API TinyRet StreamSender_Sendto(StreamSender *thiz, char buf[1375], size_t size);
+
 
 TINY_END_DECLS
 
 #endif /* __STREAM_RECEIVER_H__ */
-

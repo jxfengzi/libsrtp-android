@@ -8,7 +8,7 @@ extern "C" {
 #endif
 
 
-#define TAG             "stream_jni"
+#define TAG             "stream_s_jni"
 
 static StreamReceiver   * _receiver = NULL;
 static JavaVM           * _jvm = NULL;
