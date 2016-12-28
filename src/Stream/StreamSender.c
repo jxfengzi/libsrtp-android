@@ -28,19 +28,19 @@
 
 struct _StreamSender
 {
-    int                     sock;
-    srtp_policy_t           policy;
-    rtp_sender_t            sender;
-    bool                    initialized;
+    int sock;
+    srtp_policy_t policy;
+    rtp_sender_t sender;
+    bool initialized;
 };
 
-StreamSender * StreamSender_New(void)
+StreamSender *StreamSender_New(void)
 {
     StreamSender *thiz = NULL;
 
     do
     {
-        thiz = (StreamSender *)tiny_malloc(sizeof(StreamSender));
+        thiz = (StreamSender *) tiny_malloc(sizeof(StreamSender));
         if (thiz == NULL)
         {
             LOG_D(TAG, "tiny_malloc FAILED.");
@@ -126,13 +126,15 @@ TinyRet StreamSender_Initialize(StreamSender *thiz, const char *ip, int port, co
             break;
         }
 
-        if (0 == inet_aton(ip, &address)) {
+        if (0 == inet_aton(ip, &address))
+        {
             LOG_E(TAG, "cannot parse IP v4 address %s", ip);
             ret = TINY_RET_E_ARG_INVALID;
             break;
         }
 
-        if (address.s_addr == INADDR_NONE) {
+        if (address.s_addr == INADDR_NONE)
+        {
             LOG_E(TAG, "address error: %s", ip);
             ret = TINY_RET_E_ARG_INVALID;
             break;
@@ -146,9 +148,12 @@ TinyRet StreamSender_Initialize(StreamSender *thiz, const char *ip, int port, co
             break;
         }
 
-        name.sin_addr   = address;
+        name.sin_addr = address;
         name.sin_family = PF_INET;
-        name.sin_port   = htons(port);
+        name.sin_port = htons(port);
+
+        LOG_E(TAG, "sin_addr: %d", name.sin_addr.s_addr);
+        LOG_E(TAG, "sin_port: %d", name.sin_port);
 
         /**
          * 128 bit key
@@ -159,10 +164,10 @@ TinyRet StreamSender_Initialize(StreamSender *thiz, const char *ip, int port, co
         srtp_crypto_policy_set_rtp_default(&thiz->policy.rtp);
         srtp_crypto_policy_set_rtcp_default(&thiz->policy.rtcp);
 
-        thiz->policy.ssrc.type  = ssrc_any_outbound;
+        thiz->policy.ssrc.type = ssrc_any_outbound;
         thiz->policy.ssrc.value = ssrc;
-        thiz->policy.key  = (uint8_t *) key;
-        thiz->policy.ekt  = NULL;
+        thiz->policy.key = (uint8_t *) key;
+        thiz->policy.ekt = NULL;
         thiz->policy.next = NULL;
         thiz->policy.window_size = 128;
         thiz->policy.allow_repeat_tx = 0;
@@ -173,7 +178,7 @@ TinyRet StreamSender_Initialize(StreamSender *thiz, const char *ip, int port, co
          * read key from hexadecimal or base64 on command line into an octet string
          */
         pad = 0;
-        expected_len = (thiz->policy.rtp.cipher_key_len * 4)/3;
+        expected_len = (thiz->policy.rtp.cipher_key_len * 4) / 3;
         len = base64_string_to_octet_string(key, &pad, keyBase64, expected_len);
         if (pad != 0)
         {
@@ -192,7 +197,8 @@ TinyRet StreamSender_Initialize(StreamSender *thiz, const char *ip, int port, co
 
         if ((int) strlen(keyBase64) > thiz->policy.rtp.cipher_key_len * 2)
         {
-            LOG_E(TAG, "error: too many digits in key/salt (should be %d hexadecimal digits, found %u)", thiz->policy.rtp.cipher_key_len * 2, (unsigned)strlen(keyBase64));
+            LOG_E(TAG, "error: too many digits in key/salt (should be %d hexadecimal digits, found %u)",
+                  thiz->policy.rtp.cipher_key_len * 2, (unsigned) strlen(keyBase64));
             ret = TINY_RET_E_ARG_INVALID;
             break;
         }
@@ -230,7 +236,8 @@ TinyRet StreamSender_Initialize(StreamSender *thiz, const char *ip, int port, co
         rtp_sender_init(thiz->sender, thiz->sock, name, ssrc);
 
         status = (srtp_err_status_t) rtp_sender_init_srtp(thiz->sender, &thiz->policy);
-        if (status != srtp_err_status_ok) {
+        if (status != srtp_err_status_ok)
+        {
             LOG_E(TAG, "error: srtp_create() failed with code %d", status);
             ret = TINY_RET_E_INTERNAL;
             break;
@@ -248,14 +255,20 @@ TinyRet StreamSender_Sendto(StreamSender *thiz, char buf[1375], size_t size)
 
     do
     {
-        if (! thiz->initialized) {
+        int count = 0;
+
+        if (!thiz->initialized)
+        {
             LOG_E(TAG, "not initialized");
             ret = TINY_RET_E_NOT_INITIALIZED;
             break;
         }
 
-        rtp_sendto(thiz->sender, buf, size);
-
+        count = rtp_sendto(thiz->sender, buf, (int) size);
+        if (count < 0)
+        {
+            ret = TINY_RET_E_INTERNAL;
+        }
     } while (false);
 
     return ret;
@@ -263,7 +276,8 @@ TinyRet StreamSender_Sendto(StreamSender *thiz, char buf[1375], size_t size)
 
 void StreamSender_Finalize(StreamSender *thiz)
 {
-    if (! thiz->initialized) {
+    if (!thiz->initialized)
+    {
         return;
     }
 

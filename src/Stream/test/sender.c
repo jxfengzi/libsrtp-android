@@ -15,27 +15,43 @@ int main(int argc, char *argv[])
 
     if (argc != 2)
     {
-        printf("usage: %s [filename]", argv[0]);
+        printf("usage: %s [filename]\n", argv[0]);
         return 0;
     }
 
     fp = fopen(argv[1], "rb");
+    if (fp == NULL) {
+        printf("open file failed: %s\n", argv[1]);
+        return 1;
+    }
 
-    StreamSender_Initialize(thiz, ip, port, key, ssrc);
+    if (RET_FAILED(StreamSender_Initialize(thiz, ip, port, key, ssrc)))
+    {
+        printf("StreamSender_Initialize failed\n");
+        return 2;
+    }
+
+    printf("Sending ...\n");
 
     while (1)
     {
+        TinyRet ret = TINY_RET_OK;
         char buf[PACKET_SIZE];
         size_t size = 0;
 
         memset(buf, 0, PACKET_SIZE);
-        size = fread(buf, PACKET_SIZE, 1, fp);
+        size = fread(buf, 1, PACKET_SIZE, fp);
         if (size <= 0)
         {
             break;
         }
 
-        StreamSender_Sendto(thiz, buf, size);
+//        printf("PACKET_SIZE: %d\n", PACKET_SIZE);
+//        printf("size: %ld\n", size);
+
+        ret = StreamSender_Sendto(thiz, buf, size);
+
+        printf("StreamSender_Sendto: %lld\n", ret);
 
         usleep(USEC_RATE);
     }
