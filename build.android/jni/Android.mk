@@ -33,12 +33,12 @@ MY_CFLAGS               := -D __ANDROID__                                   \
 MY_ARCH                 := armeabi
 
 #----------------------------------------------------------------------------
-# libsrtp.a
+# libsrtp.so
 #----------------------------------------------------------------------------
 include $(CLEAR_VARS)
 LOCAL_MODULE            := srtp2
-LOCAL_SRC_FILES         := ../../libsrtp/libsrtp2.a
-include $(PREBUILT_STATIC_LIBRARY)
+LOCAL_SRC_FILES         := ../../libsrtp/libsrtp2.so
+include $(PREBUILT_SHARED_LIBRARY)
 
 #----------------------------------------------------------------------------
 # test: rtpw
@@ -86,7 +86,8 @@ LOCAL_SRC_FILES         := $(SRC_DIR)/rtp.c                                 \
                            $(SRC_DIR)/StreamReceiver.c
 LOCAL_C_FLAGS           := $(MY_CFLAGS)
 LOCAL_C_INCLUDES        := $(INC_ALL)
-LOCAL_STATIC_LIBRARIES  := libsrtp2 libtiny
+LOCAL_SHARED_LIBRARIES  := libsrtp2
+LOCAL_STATIC_LIBRARIES  := libtiny
 LOCAL_LDLIBS            := -llog
 include $(BUILD_SHARED_LIBRARY)
 
@@ -96,7 +97,7 @@ include $(BUILD_SHARED_LIBRARY)
 include $(CLEAR_VARS)
 LOCAL_MODULE            := stream_r_jni
 SRC_DIR                 := ../../src/Stream
-LOCAL_SRC_FILES         := $(SRC_DIR)/com_ouyang_camera_CameraStreamReceiver.c
+LOCAL_SRC_FILES         := $(SRC_DIR)/com_ouyang_srtp_SrtpStreamReceiver.c
 LOCAL_C_FLAGS           := $(MY_CFLAGS)
 LOCAL_C_INCLUDES        := $(INC_ALL)
 LOCAL_SHARED_LIBRARIES  := stream
@@ -109,7 +110,7 @@ include $(BUILD_SHARED_LIBRARY)
 include $(CLEAR_VARS)
 LOCAL_MODULE            := stream_s_jni
 SRC_DIR                 := ../../src/Stream
-LOCAL_SRC_FILES         := $(SRC_DIR)/com_ouyang_camera_CameraStreamSender.c
+LOCAL_SRC_FILES         := $(SRC_DIR)/com_ouyang_srtp_SrtpStreamSender.c
 LOCAL_C_FLAGS           := $(MY_CFLAGS)
 LOCAL_C_INCLUDES        := $(INC_ALL)
 LOCAL_SHARED_LIBRARIES  := stream

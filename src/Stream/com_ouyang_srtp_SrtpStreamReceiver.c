@@ -16,7 +16,7 @@ static jobject            _handler = NULL;
 static jmethodID          _onPacket_MethodID = NULL;
 
 /**
- * public interface StreamHandler {
+ * public interface SrtpStreamHandler {
  *     void onPacket(byte[] data, int size)
  * }
  */
@@ -118,7 +118,7 @@ static void packet_handler(const char *packet, int len)
 }
 
 /*
- * Class:     com_ouyang_camera_CameraStreamReceiver
+ * Class:     com_ouyang_srtp_SrtpStreamReceiver
  * Method:    initialize
  * Signature: ()I
  */
@@ -138,7 +138,7 @@ JNIEXPORT jint JNICALL _initialize(JNIEnv * env, jobject obj)
 }
 
 /*
- * Class:     com_ouyang_camera_CameraStreamReceiver
+ * Class:     com_ouyang_srtp_SrtpStreamReceiver
  * Method:    destroy
  * Signature: ()I
  */
@@ -158,9 +158,9 @@ JNIEXPORT jint JNICALL _destroy(JNIEnv *env, jobject obj)
 }
 
 /*
- * Class:     com_ouyang_camera_CameraStreamReceiver
+ * Class:     com_ouyang_srtp_SrtpStreamReceiver
  * Method:    start
- * Signature: (Ljava/lang/String;ILjava/lang/String;ILcom/ouyang/camera/StreamHandler;)I
+ * Signature: (Ljava/lang/String;ILjava/lang/String;ILcom/ouyang/srtp/SrtpStreamHandler;)I
  */
 JNIEXPORT jint JNICALL _start(JNIEnv *env,
                               jobject obj,
@@ -217,7 +217,7 @@ JNIEXPORT jint JNICALL _start(JNIEnv *env,
 }
 
 /*
- * Class:     com_ouyang_camera_CameraStreamReceiver
+ * Class:     com_ouyang_srtp_SrtpStreamReceiver
  * Method:    stop
  * Signature: ()I
  */
@@ -242,13 +242,13 @@ JNIEXPORT jint JNICALL _stop(JNIEnv * env, jobject obj)
     return 0;
 }
 
-static const char * _theClass = "com/ouyang/camera/CameraStreamReceiver";
+static const char * _theClass = "com/ouyang/srtp/SrtpStreamReceiver";
 
 static JNINativeMethod _theMethods[] =
         {
                 {"initialize", "()I", &_initialize},
                 {"destroy", "()I", &_destroy},
-                {"start", "(Ljava/lang/String;ILjava/lang/String;ILcom/ouyang/camera/StreamHandler;)I", &_start},
+                {"start", "(Ljava/lang/String;ILjava/lang/String;ILcom/ouyang/srtp/SrtpStreamHandler;)I", &_start},
                 {"stop", "()I", &_stop},
         };
 
@@ -258,7 +258,7 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved)
     jclass clazz;
     int version = -1;
 
-    LOG_I(TAG, "%s", "JNI_OnLoad");
+    LOG_I(TAG, "-> JNI_OnLoad");
 
     do
     {

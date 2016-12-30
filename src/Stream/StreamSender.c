@@ -38,6 +38,8 @@ StreamSender *StreamSender_New(void)
 {
     StreamSender *thiz = NULL;
 
+    LOG_D(TAG, "New");
+
     do
     {
         thiz = (StreamSender *) tiny_malloc(sizeof(StreamSender));
@@ -64,6 +66,8 @@ TinyRet StreamSender_Construct(StreamSender *thiz)
 
     RETURN_VAL_IF_FAIL(thiz, TINY_RET_E_ARG_NULL);
 
+    LOG_D(TAG, "Construct");
+
     do
     {
         srtp_err_status_t status;
@@ -89,6 +93,8 @@ void StreamSender_Dispose(StreamSender *thiz)
 {
     RETURN_IF_FAIL(thiz);
 
+    LOG_D(TAG, "Dispose");
+
     StreamSender_Finalize(thiz);
 
     srtp_shutdown();
@@ -100,6 +106,8 @@ void StreamSender_Delete(StreamSender *thiz)
 {
     RETURN_IF_FAIL(thiz);
 
+    LOG_D(TAG, "Delete");
+
     StreamSender_Dispose(thiz);
     tiny_free(thiz);
 }
@@ -107,6 +115,8 @@ void StreamSender_Delete(StreamSender *thiz)
 TinyRet StreamSender_Initialize(StreamSender *thiz, const char *ip, int port, const char *keyBase64, uint32_t ssrc)
 {
     TinyRet ret = TINY_RET_OK;
+
+    LOG_D(TAG, "Initialize");
 
     do
     {
@@ -152,8 +162,7 @@ TinyRet StreamSender_Initialize(StreamSender *thiz, const char *ip, int port, co
         name.sin_family = PF_INET;
         name.sin_port = htons(port);
 
-        LOG_E(TAG, "sin_addr: %d", name.sin_addr.s_addr);
-        LOG_E(TAG, "sin_port: %d", name.sin_port);
+        LOG_E(TAG, "RtpReceiver: %s:%d", inet_ntoa(name.sin_addr), ntohs(name.sin_port));
 
         /**
          * 128 bit key
@@ -249,7 +258,7 @@ TinyRet StreamSender_Initialize(StreamSender *thiz, const char *ip, int port, co
     return ret;
 }
 
-TinyRet StreamSender_Sendto(StreamSender *thiz, char buf[1375], size_t size)
+TinyRet StreamSender_Sendto(StreamSender *thiz, const char * buf, size_t size)
 {
     TinyRet ret = TINY_RET_OK;
 
@@ -276,13 +285,23 @@ TinyRet StreamSender_Sendto(StreamSender *thiz, char buf[1375], size_t size)
 
 void StreamSender_Finalize(StreamSender *thiz)
 {
+    LOG_D(TAG, "Finalize");
+
     if (!thiz->initialized)
     {
         return;
     }
 
-    rtp_sender_deinit_srtp(thiz->sender);
-    rtp_sender_dealloc(thiz->sender);
+    if (thiz->sender != NULL)
+    {
+        if (thiz->sender->srtp_ctx != NULL)
+        {
+            rtp_sender_deinit_srtp(thiz->sender);
+        }
+
+        rtp_sender_dealloc(thiz->sender);
+    }
+
     close(thiz->sock);
 
     thiz->initialized = false;

@@ -74,6 +74,12 @@ int rtp_sendto(rtp_sender_t sender, const void *msg, int len)
     sender->message.header.ts = htonl(sender->message.header.ts);
 
     /* apply srtp */
+    if (sender->srtp_ctx == NULL)
+    {
+        LOG_E(TAG, "srtp_ctx is NULL");
+        return 0;
+    }
+
     stat = srtp_protect(sender->srtp_ctx, &sender->message.header, &pkt_len);
     if (stat)
     {
@@ -97,6 +103,12 @@ int rtp_sendto(rtp_sender_t sender, const void *msg, int len)
     {
         LOG_E(TAG, "error: couldn't send message");
         perror("");
+    }
+
+    if (sender->srtp_ctx == NULL)
+    {
+        LOG_E(TAG, "srtp_ctx is NULL 2");
+        sender->srtp_ctx->stream_template = NULL;
     }
 
     return octets_sent;

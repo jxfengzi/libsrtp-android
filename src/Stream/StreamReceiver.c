@@ -174,6 +174,8 @@ TinyRet StreamReceiver_Start(StreamReceiver *thiz,
         name.sin_family = PF_INET;
         name.sin_port   = htons(port);
 
+        LOG_E(TAG, "Start: %s:%d", inet_ntoa(name.sin_addr), ntohs(name.sin_port));
+
         /**
          * 128 bit key
          */

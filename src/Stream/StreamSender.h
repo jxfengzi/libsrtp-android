@@ -34,7 +34,7 @@ STREAM_API void StreamSender_Delete(StreamSender *thiz);
 
 STREAM_API TinyRet StreamSender_Initialize(StreamSender *thiz, const char *ip, int port, const char *key, uint32_t ssrc);
 STREAM_API void StreamSender_Finalize(StreamSender *thiz);
-STREAM_API TinyRet StreamSender_Sendto(StreamSender *thiz, char buf[1375], size_t size);
+STREAM_API TinyRet StreamSender_Sendto(StreamSender *thiz, const char * buf, size_t size);
 
 
 TINY_END_DECLS

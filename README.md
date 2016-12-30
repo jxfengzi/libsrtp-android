@@ -7,10 +7,27 @@ libsrtp for android
 
     git submodule update
 
-    export CC=/home/ouyang/android/arm-linux-androideabi-4.6/bin/arm-linux-androideabi-gcc
+    ## export CC=/home/ouyang/android/arm-linux-androideabi-4.6/bin/arm-linux-androideabi-gcc
 
+    export TOOLCHAIN=$ANDROID_NDK/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64
+    
+    export CC=$TOOLCHAIN/bin/arm-linux-androideabi-gcc
+        
+    export SYSROOT=$ANDROID_NDK/platforms/android-21/arch-arm
+    
+    export CFLAGS="--sysroot=$SYSROOT -g"
+    
+    export LDFLAGS="-L$SYSROOT/usr/lib -g"
+    
+    ln -snf $SYSROOT/usr/lib/crtbegin_so.o ./
+    ln -snf $SYSROOT/usr/lib/crtend_so.o ./
+    
     ./configure --host=x86_64
     
+    make
+    
+    make libsrtp2.so
+
 ## how to test (rtpw not -a)
 
     ./test/rtpw -r -b 7MB1gHv/o96kMuO1cqT0Z0xOoslqwq7nw/2lpuSO -d all -e 128 192.168.31.119 9999

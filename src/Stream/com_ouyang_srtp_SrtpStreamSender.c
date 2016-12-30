@@ -8,10 +8,10 @@ extern "C" {
 
 #define TAG             "stream_s_jni"
 
-static StreamSender   * _sender = NULL;
+static StreamSender   * _gSender = NULL;
 
 /*
- * Class:     com_ouyang_camera_CameraStreamSender
+ * Class:     com_ouyang_srtp_SrtpStreamSender
  * Method:    initialize
  * Signature: (Ljava/lang/String;ILjava/lang/String;I)I
  */
@@ -41,23 +41,25 @@ JNIEXPORT jint JNICALL _initialize(JNIEnv *env, jobject obj, jstring ip, jint po
         return -2;
     }
 
-    return StreamSender_Initialize(_sender, c_ip, c_port, c_key, c_ssrc);
+    return StreamSender_Initialize(_gSender, c_ip, c_port, c_key, c_ssrc);
 }
 
 /*
- * Class:     com_ouyang_camera_CameraStreamSender
+ * Class:     com_ouyang_srtp_SrtpStreamSender
  * Method:    destroy
  * Signature: ()I
  */
 JNIEXPORT jint JNICALL _destroy(JNIEnv *env, jobject obj)
 {
-    StreamSender_Finalize(_sender);
+    LOG_D(TAG, "_destroy");
+
+    StreamSender_Finalize(_gSender);
 
     return 0;
 }
 
 /*
- * Class:     com_ouyang_camera_CameraStreamSender
+ * Class:     com_ouyang_srtp_SrtpStreamSender
  * Method:    Sendto
  * Signature: ([BI)I
  */
@@ -67,10 +69,12 @@ JNIEXPORT jint JNICALL _sendto(JNIEnv *env, jobject obj, jbyteArray buf, jint le
     char* c_buf = (char *)buffer;
     int c_len = len;
 
-    return  StreamSender_Sendto(_sender, c_buf, (size_t) c_len);
+    LOG_D(TAG, "_sendto: %d", len);
+
+    return  StreamSender_Sendto(_gSender, c_buf, (size_t) c_len);
 }
 
-static const char * _theClass = "com/ouyang/camera/CameraStreamSender";
+static const char * _theClass = "com/ouyang/srtp/SrtpStreamSender";
 
 static JNINativeMethod _theMethods[] =
         {
@@ -85,7 +89,7 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved)
     jclass clazz;
     int version = -1;
 
-    LOG_I(TAG, "%s", "JNI_OnLoad");
+    LOG_I(TAG, "-> JNI_OnLoad");
 
     do
     {
@@ -128,7 +132,7 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved)
 
         LOG_D(TAG, "RegisterNatives OK.");
 
-        _sender = StreamSender_New();
+        _gSender = StreamSender_New();
     }
     while (0);
 
@@ -139,7 +143,7 @@ void JNI_OnUnload(JavaVM* vm, void* reserved)
 {
     LOG_I(TAG, "%s", "JNI_OnUnload");
 
-    StreamSender_Delete(_sender);
+    StreamSender_Delete(_gSender);
 }
 
 #ifdef __cplusplus
