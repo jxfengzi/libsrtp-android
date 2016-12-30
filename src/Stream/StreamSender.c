@@ -258,13 +258,17 @@ TinyRet StreamSender_Initialize(StreamSender *thiz, const char *ip, int port, co
     return ret;
 }
 
+// 19461
+
+#define MAX_PACKET      (1024 * 10)
 TinyRet StreamSender_Sendto(StreamSender *thiz, const char * buf, size_t size)
 {
     TinyRet ret = TINY_RET_OK;
 
     do
     {
-        int count = 0;
+        const char *p = buf;
+        size_t sent = 0;
 
         if (!thiz->initialized)
         {
@@ -273,10 +277,22 @@ TinyRet StreamSender_Sendto(StreamSender *thiz, const char * buf, size_t size)
             break;
         }
 
-        count = rtp_sendto(thiz->sender, buf, (int) size);
-        if (count < 0)
+        while (sent < size)
         {
-            ret = TINY_RET_E_INTERNAL;
+            size_t notSent = size - sent;
+            size_t len = (notSent < MAX_PACKET) ? notSent : MAX_PACKET;
+
+//            LOG_E(TAG, "LEN: %ld", len);
+
+            int count = rtp_sendto(thiz->sender, p, (int)len);
+            if (count < 0)
+            {
+                ret = TINY_RET_E_INTERNAL;
+                break;
+            }
+
+            sent += len;
+            p += len;
         }
     } while (false);
 

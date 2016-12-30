@@ -46,6 +46,7 @@ int main(int argc, char *argv[])
         size = fread(buf, 1, read_len, fp);
         if (size <= 0)
         {
+            printf("size: %ld\n", size);
             break;
         }
 
